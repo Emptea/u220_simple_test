@@ -1,6 +1,7 @@
 options:
   parameters:
     author: ''
+    catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
     comment: ''
@@ -39,7 +40,7 @@ blocks:
     gui_hint: ''
     label: Amplitude0
     min_len: '200'
-    orient: Qt.Horizontal
+    orient: QtCore.Qt.Horizontal
     rangeType: float
     start: '0'
     step: '0.1'
@@ -52,7 +53,7 @@ blocks:
     bus_structure: null
     coordinate: [184, 20.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: amp_1
   id: variable_qtgui_range
   parameters:
@@ -60,7 +61,7 @@ blocks:
     gui_hint: ''
     label: Amplitude1
     min_len: '200'
-    orient: Qt.Horizontal
+    orient: QtCore.Qt.Horizontal
     rangeType: float
     start: '0'
     step: '0.1'
@@ -73,7 +74,7 @@ blocks:
     bus_structure: null
     coordinate: [184, 164.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: bw
   id: variable
   parameters:
@@ -105,7 +106,7 @@ blocks:
     gui_hint: ''
     label: Frequency0
     min_len: '200'
-    orient: Qt.Horizontal
+    orient: QtCore.Qt.Horizontal
     rangeType: float
     start: '0'
     step: '50'
@@ -118,7 +119,7 @@ blocks:
     bus_structure: null
     coordinate: [320, 20.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: freq_1
   id: variable_qtgui_range
   parameters:
@@ -126,7 +127,7 @@ blocks:
     gui_hint: ''
     label: Frequency1
     min_len: '200'
-    orient: Qt.Horizontal
+    orient: QtCore.Qt.Horizontal
     rangeType: float
     start: '0'
     step: '50'
@@ -139,7 +140,7 @@ blocks:
     bus_structure: null
     coordinate: [320, 164.0]
     rotation: 0
-    state: true
+    state: disabled
 - name: gain
   id: variable
   parameters:
@@ -179,7 +180,7 @@ blocks:
     bus_structure: null
     coordinate: [797, 284]
     rotation: 0
-    state: true
+    state: disabled
 - name: analog_sig_source_x_0_0
   id: analog_sig_source_x
   parameters:
@@ -201,7 +202,7 @@ blocks:
     bus_structure: null
     coordinate: [514, 24]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: analog_sig_source_x_0_0_0_0
   id: analog_sig_source_x
   parameters:
@@ -223,7 +224,7 @@ blocks:
     bus_structure: null
     coordinate: [518, 293]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: analog_sig_source_x_1
   id: analog_sig_source_x
   parameters:
@@ -245,7 +246,7 @@ blocks:
     bus_structure: null
     coordinate: [517, 164]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_float_to_complex_0
   id: blocks_float_to_complex
   parameters:
@@ -261,7 +262,7 @@ blocks:
     bus_structure: null
     coordinate: [765, 68]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_multiply_xx_0
   id: blocks_multiply_xx
   parameters:
@@ -279,7 +280,44 @@ blocks:
     bus_structure: null
     coordinate: [983, 84]
     rotation: 0
-    state: enabled
+    state: disabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\n\
+      \    def __init__(self, sample_rate=1e6, frequency=1000, duty_cycle=0.1):\n\
+      \        gr.sync_block.__init__(self,\n            name='Square with flexible\
+      \ duty',\n            in_sig=None,\n            out_sig=[np.float32])\n    \
+      \    \n        self.sample_rate = sample_rate\n        self.frequency = frequency\n\
+      \        self.samples_per_period = sample_rate / frequency\n        self.phase\
+      \ = 0\n        \n        # Register parameters\n        self.sample_rate = sample_rate\n\
+      \        self.frequency = frequency\n        self.duty_cycle = duty_cycle\n\n\
+      \    def work(self, input_items, output_items):\n        out = output_items[0]\n\
+      \        n_samples = len(out)\n        \n        for i in range(n_samples):\n\
+      \            pos_in_period = self.phase / self.samples_per_period\n        \
+      \    \n            if pos_in_period < self.duty_cycle:\n                out[i]\
+      \ = 1.0\n            else:\n                out[i] = 0.0\n            \n   \
+      \         self.phase += 1\n            if self.phase >= self.samples_per_period:\n\
+      \                self.phase -= self.samples_per_period\n        \n        return\
+      \ n_samples\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    duty_cycle: '0.9'
+    frequency: 100e3
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    sample_rate: samp_rate
+  states:
+    _io_cache: ('Square with flexible duty', 'blk', [('sample_rate', '1000000.0'),
+      ('frequency', '1000'), ('duty_cycle', '0.1')], [], [('0', 'float', 1)], '',
+      ['duty_cycle', 'frequency', 'sample_rate'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [808, 372.0]
+    rotation: 0
+    state: true
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:
@@ -332,6 +370,7 @@ blocks:
     minoutbuf: '0'
     name: '"spectrum_ rx1"'
     nconnections: '1'
+    norm_window: 'False'
     showports: 'False'
     tr_chan: '0'
     tr_level: '0.0'
@@ -350,7 +389,7 @@ blocks:
     width7: '1'
     width8: '1'
     width9: '1'
-    wintype: firdes.WIN_BLACKMAN_hARRIS
+    wintype: window.WIN_BLACKMAN_hARRIS
     ymax: '10'
     ymin: '-140'
   states:
@@ -359,7 +398,7 @@ blocks:
     bus_structure: null
     coordinate: [888, 483]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_freq_sink_x_0_0
   id: qtgui_freq_sink_x
   parameters:
@@ -412,6 +451,7 @@ blocks:
     minoutbuf: '0'
     name: '"spectrum_rx2"'
     nconnections: '1'
+    norm_window: 'False'
     showports: 'False'
     tr_chan: '0'
     tr_level: '0.0'
@@ -430,7 +470,7 @@ blocks:
     width7: '1'
     width8: '1'
     width9: '1'
-    wintype: firdes.WIN_BLACKMAN_hARRIS
+    wintype: window.WIN_BLACKMAN_hARRIS
     ymax: '10'
     ymin: '-140'
   states:
@@ -439,7 +479,7 @@ blocks:
     bus_structure: null
     coordinate: [1128, 627]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_time_sink_x_0
   id: qtgui_time_sink_x
   parameters:
@@ -536,7 +576,7 @@ blocks:
     bus_structure: null
     coordinate: [888, 651]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_time_sink_x_0_0
   id: qtgui_time_sink_x
   parameters:
@@ -633,7 +673,7 @@ blocks:
     bus_structure: null
     coordinate: [1088, 507]
     rotation: 0
-    state: true
+    state: disabled
 - name: qtgui_time_sink_x_0_0_0
   id: qtgui_time_sink_x
   parameters:
@@ -729,6 +769,103 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1108, 229]
+    rotation: 0
+    state: disabled
+- name: qtgui_time_sink_x_0_0_0_0
+  id: qtgui_time_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha1: '1.0'
+    alpha10: '1.0'
+    alpha2: '1.0'
+    alpha3: '1.0'
+    alpha4: '1.0'
+    alpha5: '1.0'
+    alpha6: '1.0'
+    alpha7: '1.0'
+    alpha8: '1.0'
+    alpha9: '1.0'
+    autoscale: 'False'
+    axislabels: 'True'
+    color1: blue
+    color10: dark blue
+    color2: red
+    color3: green
+    color4: black
+    color5: cyan
+    color6: magenta
+    color7: yellow
+    color8: dark red
+    color9: dark green
+    comment: ''
+    ctrlpanel: 'False'
+    entags: 'True'
+    grid: 'False'
+    gui_hint: ''
+    label1: re
+    label10: Signal 10
+    label2: im
+    label3: Signal 3
+    label4: Signal 4
+    label5: Signal 5
+    label6: Signal 6
+    label7: Signal 7
+    label8: Signal 8
+    label9: Signal 9
+    legend: 'True'
+    marker1: '-1'
+    marker10: '-1'
+    marker2: '-1'
+    marker3: '-1'
+    marker4: '-1'
+    marker5: '-1'
+    marker6: '-1'
+    marker7: '-1'
+    marker8: '-1'
+    marker9: '-1'
+    name: '"Generated signal"'
+    nconnections: '1'
+    size: '1024'
+    srate: samp_rate
+    stemplot: 'False'
+    style1: '1'
+    style10: '1'
+    style2: '1'
+    style3: '1'
+    style4: '1'
+    style5: '1'
+    style6: '1'
+    style7: '1'
+    style8: '1'
+    style9: '1'
+    tr_chan: '0'
+    tr_delay: '0'
+    tr_level: '0.0'
+    tr_mode: qtgui.TRIG_MODE_AUTO
+    tr_slope: qtgui.TRIG_SLOPE_POS
+    tr_tag: '""'
+    type: float
+    update_time: '0.1'
+    width1: '1'
+    width10: '1'
+    width2: '1'
+    width3: '1'
+    width4: '1'
+    width5: '1'
+    width6: '1'
+    width7: '1'
+    width8: '1'
+    width9: '1'
+    ylabel: Amplitude
+    ymax: '1'
+    ymin: '-1'
+    yunit: '""'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1200, 364.0]
     rotation: 0
     state: true
 - name: uhd_usrp_sink_0
@@ -876,6 +1013,38 @@ blocks:
     gain7: '0'
     gain8: '0'
     gain9: '0'
+    gain_type0: default
+    gain_type1: default
+    gain_type10: default
+    gain_type11: default
+    gain_type12: default
+    gain_type13: default
+    gain_type14: default
+    gain_type15: default
+    gain_type16: default
+    gain_type17: default
+    gain_type18: default
+    gain_type19: default
+    gain_type2: default
+    gain_type20: default
+    gain_type21: default
+    gain_type22: default
+    gain_type23: default
+    gain_type24: default
+    gain_type25: default
+    gain_type26: default
+    gain_type27: default
+    gain_type28: default
+    gain_type29: default
+    gain_type3: default
+    gain_type30: default
+    gain_type31: default
+    gain_type4: default
+    gain_type5: default
+    gain_type6: default
+    gain_type7: default
+    gain_type8: default
+    gain_type9: default
     len_tag_name: '""'
     lo_export0: 'False'
     lo_export1: 'False'
@@ -944,38 +1113,6 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     nchan: '2'
-    norm_gain0: 'False'
-    norm_gain1: 'False'
-    norm_gain10: 'False'
-    norm_gain11: 'False'
-    norm_gain12: 'False'
-    norm_gain13: 'False'
-    norm_gain14: 'False'
-    norm_gain15: 'False'
-    norm_gain16: 'False'
-    norm_gain17: 'False'
-    norm_gain18: 'False'
-    norm_gain19: 'False'
-    norm_gain2: 'False'
-    norm_gain20: 'False'
-    norm_gain21: 'False'
-    norm_gain22: 'False'
-    norm_gain23: 'False'
-    norm_gain24: 'False'
-    norm_gain25: 'False'
-    norm_gain26: 'False'
-    norm_gain27: 'False'
-    norm_gain28: 'False'
-    norm_gain29: 'False'
-    norm_gain3: 'False'
-    norm_gain30: 'False'
-    norm_gain31: 'False'
-    norm_gain4: 'False'
-    norm_gain5: 'False'
-    norm_gain6: 'False'
-    norm_gain7: 'False'
-    norm_gain8: 'False'
-    norm_gain9: 'False'
     num_mboards: '1'
     otw: ''
     samp_rate: samp_rate
@@ -988,6 +1125,7 @@ blocks:
     sd_spec6: ''
     sd_spec7: ''
     show_lo_controls: 'False'
+    start_time: '-1.0'
     stream_args: ''
     stream_chans: '[0,1]'
     sync: none
@@ -1006,7 +1144,7 @@ blocks:
     bus_structure: null
     coordinate: [1276, 33]
     rotation: 0
-    state: true
+    state: disabled
 - name: uhd_usrp_source_0
   id: uhd_usrp_source
   parameters:
@@ -1118,6 +1256,38 @@ blocks:
     clock_source6: ''
     clock_source7: ''
     comment: ''
+    dc_offs0: 0+0j
+    dc_offs1: 0+0j
+    dc_offs10: 0+0j
+    dc_offs11: 0+0j
+    dc_offs12: 0+0j
+    dc_offs13: 0+0j
+    dc_offs14: 0+0j
+    dc_offs15: 0+0j
+    dc_offs16: 0+0j
+    dc_offs17: 0+0j
+    dc_offs18: 0+0j
+    dc_offs19: 0+0j
+    dc_offs2: 0+0j
+    dc_offs20: 0+0j
+    dc_offs21: 0+0j
+    dc_offs22: 0+0j
+    dc_offs23: 0+0j
+    dc_offs24: 0+0j
+    dc_offs25: 0+0j
+    dc_offs26: 0+0j
+    dc_offs27: 0+0j
+    dc_offs28: 0+0j
+    dc_offs29: 0+0j
+    dc_offs3: 0+0j
+    dc_offs30: 0+0j
+    dc_offs31: 0+0j
+    dc_offs4: 0+0j
+    dc_offs5: 0+0j
+    dc_offs6: 0+0j
+    dc_offs7: 0+0j
+    dc_offs8: 0+0j
+    dc_offs9: 0+0j
     dc_offs_enb0: default
     dc_offs_enb1: default
     dc_offs_enb10: default
@@ -1184,6 +1354,70 @@ blocks:
     gain7: '0'
     gain8: '0'
     gain9: '0'
+    gain_type0: default
+    gain_type1: default
+    gain_type10: default
+    gain_type11: default
+    gain_type12: default
+    gain_type13: default
+    gain_type14: default
+    gain_type15: default
+    gain_type16: default
+    gain_type17: default
+    gain_type18: default
+    gain_type19: default
+    gain_type2: default
+    gain_type20: default
+    gain_type21: default
+    gain_type22: default
+    gain_type23: default
+    gain_type24: default
+    gain_type25: default
+    gain_type26: default
+    gain_type27: default
+    gain_type28: default
+    gain_type29: default
+    gain_type3: default
+    gain_type30: default
+    gain_type31: default
+    gain_type4: default
+    gain_type5: default
+    gain_type6: default
+    gain_type7: default
+    gain_type8: default
+    gain_type9: default
+    iq_imbal0: 0+0j
+    iq_imbal1: 0+0j
+    iq_imbal10: 0+0j
+    iq_imbal11: 0+0j
+    iq_imbal12: 0+0j
+    iq_imbal13: 0+0j
+    iq_imbal14: 0+0j
+    iq_imbal15: 0+0j
+    iq_imbal16: 0+0j
+    iq_imbal17: 0+0j
+    iq_imbal18: 0+0j
+    iq_imbal19: 0+0j
+    iq_imbal2: 0+0j
+    iq_imbal20: 0+0j
+    iq_imbal21: 0+0j
+    iq_imbal22: 0+0j
+    iq_imbal23: 0+0j
+    iq_imbal24: 0+0j
+    iq_imbal25: 0+0j
+    iq_imbal26: 0+0j
+    iq_imbal27: 0+0j
+    iq_imbal28: 0+0j
+    iq_imbal29: 0+0j
+    iq_imbal3: 0+0j
+    iq_imbal30: 0+0j
+    iq_imbal31: 0+0j
+    iq_imbal4: 0+0j
+    iq_imbal5: 0+0j
+    iq_imbal6: 0+0j
+    iq_imbal7: 0+0j
+    iq_imbal8: 0+0j
+    iq_imbal9: 0+0j
     iq_imbal_enb0: default
     iq_imbal_enb1: default
     iq_imbal_enb10: default
@@ -1283,38 +1517,6 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     nchan: '2'
-    norm_gain0: 'False'
-    norm_gain1: 'False'
-    norm_gain10: 'False'
-    norm_gain11: 'False'
-    norm_gain12: 'False'
-    norm_gain13: 'False'
-    norm_gain14: 'False'
-    norm_gain15: 'False'
-    norm_gain16: 'False'
-    norm_gain17: 'False'
-    norm_gain18: 'False'
-    norm_gain19: 'False'
-    norm_gain2: 'False'
-    norm_gain20: 'False'
-    norm_gain21: 'False'
-    norm_gain22: 'False'
-    norm_gain23: 'False'
-    norm_gain24: 'False'
-    norm_gain25: 'False'
-    norm_gain26: 'False'
-    norm_gain27: 'False'
-    norm_gain28: 'False'
-    norm_gain29: 'False'
-    norm_gain3: 'False'
-    norm_gain30: 'False'
-    norm_gain31: 'False'
-    norm_gain4: 'False'
-    norm_gain5: 'False'
-    norm_gain6: 'False'
-    norm_gain7: 'False'
-    norm_gain8: 'False'
-    norm_gain9: 'False'
     num_mboards: '1'
     otw: ''
     rx_agc0: Default
@@ -1359,6 +1561,7 @@ blocks:
     sd_spec6: ''
     sd_spec7: ''
     show_lo_controls: 'False'
+    start_time: '-1.0'
     stream_args: ''
     stream_chans: '[0,1]'
     sync: none
@@ -1377,7 +1580,7 @@ blocks:
     bus_structure: null
     coordinate: [600, 475]
     rotation: 0
-    state: true
+    state: disabled
 
 connections:
 - [analog_frequency_modulator_fc_0, '0', blocks_multiply_xx_0, '1']
@@ -1388,6 +1591,7 @@ connections:
 - [blocks_multiply_xx_0, '0', qtgui_time_sink_x_0_0_0, '0']
 - [blocks_multiply_xx_0, '0', uhd_usrp_sink_0, '0']
 - [blocks_multiply_xx_0, '0', uhd_usrp_sink_0, '1']
+- [epy_block_0, '0', qtgui_time_sink_x_0_0_0_0, '0']
 - [uhd_usrp_source_0, '0', qtgui_freq_sink_x_0, '0']
 - [uhd_usrp_source_0, '0', qtgui_time_sink_x_0_0, '0']
 - [uhd_usrp_source_0, '1', qtgui_freq_sink_x_0_0, '0']
