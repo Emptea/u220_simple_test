@@ -6,9 +6,9 @@
 #
 # GNU Radio Python Flow Graph
 # Title: lab3_antsdr_tone
-# GNU Radio version: 3.10.1.1
+# GNU Radio version: 3.8.1.0
 
-from packaging.version import Version as StrictVersion
+from distutils.version import StrictVersion
 
 if __name__ == '__main__':
     import ctypes
@@ -24,23 +24,22 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
+from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import gr
-from gnuradio.fft import window
 import sys
 import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
-
-
-
+from gnuradio import uhd
+import time
 from gnuradio import qtgui
 
 class test_example(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "lab3_antsdr_tone", catch_exceptions=True)
+        gr.top_block.__init__(self, "lab3_antsdr_tone")
         Qt.QWidget.__init__(self)
         self.setWindowTitle("lab3_antsdr_tone")
         qtgui.util.check_set_qss()
@@ -83,25 +82,43 @@ class test_example(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.qtgui_time_sink_x_0_0_0_0 = qtgui.time_sink_f(
+        self.uhd_usrp_sink_0 = uhd.usrp_sink(
+            ",".join(("type=b200", '')),
+            uhd.stream_args(
+                cpu_format="fc32",
+                args='',
+                channels=[0,1],
+            ),
+            "",
+        )
+        self.uhd_usrp_sink_0.set_center_freq(center_freq, 0)
+        self.uhd_usrp_sink_0.set_gain(gain, 0)
+        self.uhd_usrp_sink_0.set_antenna("TX/RX", 0)
+        self.uhd_usrp_sink_0.set_bandwidth(bw, 0)
+        self.uhd_usrp_sink_0.set_center_freq(center_freq, 1)
+        self.uhd_usrp_sink_0.set_gain(gain, 1)
+        self.uhd_usrp_sink_0.set_antenna("TX/RX", 1)
+        self.uhd_usrp_sink_0.set_bandwidth(bw, 1)
+        self.uhd_usrp_sink_0.set_samp_rate(samp_rate)
+        # No synchronization enforced.
+        self.qtgui_time_sink_x_0_0_0 = qtgui.time_sink_c(
             232, #size
             samp_rate, #samp_rate
             "Generated signal", #name
-            1, #number of inputs
-            None # parent
+            1 #number of inputs
         )
-        self.qtgui_time_sink_x_0_0_0_0.set_update_time(0.1)
-        self.qtgui_time_sink_x_0_0_0_0.set_y_axis(-1, 1)
+        self.qtgui_time_sink_x_0_0_0.set_update_time(0.1)
+        self.qtgui_time_sink_x_0_0_0.set_y_axis(-1, 1)
 
-        self.qtgui_time_sink_x_0_0_0_0.set_y_label('Amplitude', "")
+        self.qtgui_time_sink_x_0_0_0.set_y_label('Amplitude', "")
 
-        self.qtgui_time_sink_x_0_0_0_0.enable_tags(True)
-        self.qtgui_time_sink_x_0_0_0_0.set_trigger_mode(qtgui.TRIG_MODE_AUTO, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_0_0_0_0.enable_autoscale(True)
-        self.qtgui_time_sink_x_0_0_0_0.enable_grid(True)
-        self.qtgui_time_sink_x_0_0_0_0.enable_axis_labels(True)
-        self.qtgui_time_sink_x_0_0_0_0.enable_control_panel(False)
-        self.qtgui_time_sink_x_0_0_0_0.enable_stem_plot(False)
+        self.qtgui_time_sink_x_0_0_0.enable_tags(True)
+        self.qtgui_time_sink_x_0_0_0.set_trigger_mode(qtgui.TRIG_MODE_AUTO, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_0_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_0_0_0.enable_grid(False)
+        self.qtgui_time_sink_x_0_0_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_0_0_0.enable_control_panel(False)
+        self.qtgui_time_sink_x_0_0_0.enable_stem_plot(False)
 
 
         labels = ['re', 'im', 'Signal 3', 'Signal 4', 'Signal 5',
@@ -118,34 +135,40 @@ class test_example(gr.top_block, Qt.QWidget):
             -1, -1, -1, -1, -1]
 
 
-        for i in range(1):
+        for i in range(2):
             if len(labels[i]) == 0:
-                self.qtgui_time_sink_x_0_0_0_0.set_line_label(i, "Data {0}".format(i))
+                if (i % 2 == 0):
+                    self.qtgui_time_sink_x_0_0_0.set_line_label(i, "Re{{Data {0}}}".format(i/2))
+                else:
+                    self.qtgui_time_sink_x_0_0_0.set_line_label(i, "Im{{Data {0}}}".format(i/2))
             else:
-                self.qtgui_time_sink_x_0_0_0_0.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_0_0_0_0.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_0_0_0_0.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_0_0_0_0.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_0_0_0_0.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_0_0_0_0.set_line_alpha(i, alphas[i])
+                self.qtgui_time_sink_x_0_0_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_alpha(i, alphas[i])
 
-        self._qtgui_time_sink_x_0_0_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0_0_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_0_0_win)
+        self._qtgui_time_sink_x_0_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0_0.pyqwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_0_0_win)
         self.blocks_vector_source_x_0 = blocks.vector_source_f([1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0], True, 1, )
+        self.blocks_float_to_complex_0 = blocks.float_to_complex(1)
+        self.analog_sig_source_x_1 = analog.sig_source_f(samp_rate, analog.GR_CONST_WAVE, 0, 0, 0, 0)
+
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_vector_source_x_0, 0), (self.qtgui_time_sink_x_0_0_0_0, 0))
-
+        self.connect((self.analog_sig_source_x_1, 0), (self.blocks_float_to_complex_0, 1))
+        self.connect((self.blocks_float_to_complex_0, 0), (self.qtgui_time_sink_x_0_0_0, 0))
+        self.connect((self.blocks_float_to_complex_0, 0), (self.uhd_usrp_sink_0, 1))
+        self.connect((self.blocks_float_to_complex_0, 0), (self.uhd_usrp_sink_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_float_to_complex_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "test_example")
         self.settings.setValue("geometry", self.saveGeometry())
-        self.stop()
-        self.wait()
-
         event.accept()
 
     def get_samp_rate(self):
@@ -154,7 +177,9 @@ class test_example(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.set_train_freq(self.samp_rate/232)
-        self.qtgui_time_sink_x_0_0_0_0.set_samp_rate(self.samp_rate)
+        self.analog_sig_source_x_1.set_sampling_freq(self.samp_rate)
+        self.qtgui_time_sink_x_0_0_0.set_samp_rate(self.samp_rate)
+        self.uhd_usrp_sink_0.set_samp_rate(self.samp_rate)
 
     def get_train_freq(self):
         return self.train_freq
@@ -167,6 +192,8 @@ class test_example(gr.top_block, Qt.QWidget):
 
     def set_gain(self, gain):
         self.gain = gain
+        self.uhd_usrp_sink_0.set_gain(self.gain, 0)
+        self.uhd_usrp_sink_0.set_gain(self.gain, 1)
 
     def get_duty(self):
         return self.duty
@@ -179,13 +206,16 @@ class test_example(gr.top_block, Qt.QWidget):
 
     def set_center_freq(self, center_freq):
         self.center_freq = center_freq
+        self.uhd_usrp_sink_0.set_center_freq(self.center_freq, 0)
+        self.uhd_usrp_sink_0.set_center_freq(self.center_freq, 1)
 
     def get_bw(self):
         return self.bw
 
     def set_bw(self, bw):
         self.bw = bw
-
+        self.uhd_usrp_sink_0.set_bandwidth(self.bw, 0)
+        self.uhd_usrp_sink_0.set_bandwidth(self.bw, 1)
 
 
 
@@ -197,15 +227,10 @@ def main(top_block_cls=test_example, options=None):
     qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
-
     tb.start()
-
     tb.show()
 
     def sig_handler(sig=None, frame=None):
-        tb.stop()
-        tb.wait()
-
         Qt.QApplication.quit()
 
     signal.signal(signal.SIGINT, sig_handler)
@@ -215,7 +240,12 @@ def main(top_block_cls=test_example, options=None):
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
+    def quitting():
+        tb.stop()
+        tb.wait()
+    qapp.aboutToQuit.connect(quitting)
     qapp.exec_()
+
 
 if __name__ == '__main__':
     main()
