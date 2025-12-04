@@ -99,6 +99,18 @@ blocks:
     coordinate: [24, 196.0]
     rotation: 0
     state: enabled
+- name: duty
+  id: variable
+  parameters:
+    comment: ''
+    value: 40/232
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 508.0]
+    rotation: 0
+    state: enabled
 - name: freq_0
   id: variable_qtgui_range
   parameters:
@@ -259,43 +271,6 @@ blocks:
     coordinate: [517, 164]
     rotation: 0
     state: disabled
-- name: blocks_add_xx_0
-  id: blocks_add_xx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    num_inputs: '2'
-    type: float
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1144, 448.0]
-    rotation: 0
-    state: true
-- name: blocks_delay_0
-  id: blocks_delay
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    delay: '141'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    num_ports: '1'
-    type: float
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [984, 496.0]
-    rotation: 0
-    state: true
 - name: blocks_float_to_complex_0
   id: blocks_float_to_complex
   parameters:
@@ -330,78 +305,33 @@ blocks:
     coordinate: [983, 84]
     rotation: 0
     state: disabled
-- name: epy_block_0
-  id: epy_block
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
   parameters:
-    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\n\
-      \    def __init__(self, sample_rate=1e6, frequency=1000, duty_cycle=0.1):\n\
-      \        gr.sync_block.__init__(self,\n            name='Square with flexible\
-      \ duty',\n            in_sig=None,\n            out_sig=[np.float32])\n    \
-      \    \n        self.sample_rate = sample_rate\n        self.frequency = frequency\n\
-      \        self.samples_per_period = sample_rate / frequency\n        self.phase\
-      \ = 0\n        \n        # Register parameters\n        self.sample_rate = sample_rate\n\
-      \        self.frequency = frequency\n        self.duty_cycle = duty_cycle\n\n\
-      \    def work(self, input_items, output_items):\n        out = output_items[0]\n\
-      \        n_samples = len(out)\n        \n        for i in range(n_samples):\n\
-      \            pos_in_period = self.phase / self.samples_per_period\n        \
-      \    \n            if pos_in_period < self.duty_cycle:\n                out[i]\
-      \ = 1.0\n            else:\n                out[i] = 0.0\n            \n   \
-      \         self.phase += 1\n            if self.phase >= self.samples_per_period:\n\
-      \                self.phase -= self.samples_per_period\n        \n        return\
-      \ n_samples\n"
     affinity: ''
     alias: ''
     comment: ''
-    duty_cycle: 40/232
-    frequency: train_freq
     maxoutbuf: '0'
     minoutbuf: '0'
-    sample_rate: samp_rate
+    repeat: 'True'
+    tags: ''
+    type: float
+    vector: '[1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1
+      ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,1 ,1 ,1 ,1 ,1 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+      ,0]'
+    vlen: '1'
   states:
-    _io_cache: ('Square with flexible duty', 'blk', [('sample_rate', '1000000.0'),
-      ('frequency', '1000'), ('duty_cycle', '0.1')], [], [('0', 'float', 1)], '',
-      ['duty_cycle', 'frequency', 'sample_rate'])
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [728, 372.0]
-    rotation: 0
-    state: true
-- name: epy_block_0_0
-  id: epy_block
-  parameters:
-    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\n\
-      \    def __init__(self, sample_rate=1e6, frequency=1000, duty_cycle=0.1):\n\
-      \        gr.sync_block.__init__(self,\n            name='Square with flexible\
-      \ duty',\n            in_sig=None,\n            out_sig=[np.float32])\n    \
-      \    \n        self.sample_rate = sample_rate\n        self.frequency = frequency\n\
-      \        self.samples_per_period = sample_rate / frequency\n        self.phase\
-      \ = 0\n        \n        # Register parameters\n        self.sample_rate = sample_rate\n\
-      \        self.frequency = frequency\n        self.duty_cycle = duty_cycle\n\n\
-      \    def work(self, input_items, output_items):\n        out = output_items[0]\n\
-      \        n_samples = len(out)\n        \n        for i in range(n_samples):\n\
-      \            pos_in_period = self.phase / self.samples_per_period\n        \
-      \    \n            if pos_in_period < self.duty_cycle:\n                out[i]\
-      \ = 1.0\n            else:\n                out[i] = 0.0\n            \n   \
-      \         self.phase += 1\n            if self.phase >= self.samples_per_period:\n\
-      \                self.phase -= self.samples_per_period\n        \n        return\
-      \ n_samples\n"
-    affinity: ''
-    alias: ''
-    comment: ''
-    duty_cycle: 6/232
-    frequency: train_freq
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    sample_rate: samp_rate
-  states:
-    _io_cache: ('Square with flexible duty', 'blk', [('sample_rate', '1000000.0'),
-      ('frequency', '1000'), ('duty_cycle', '0.1')], [], [('0', 'float', 1)], '',
-      ['duty_cycle', 'frequency', 'sample_rate'])
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [736, 476.0]
+    coordinate: [712, 380.0]
     rotation: 0
     state: true
 - name: qtgui_freq_sink_x_0
@@ -1673,14 +1603,11 @@ connections:
 - [analog_sig_source_x_0_0, '0', blocks_float_to_complex_0, '0']
 - [analog_sig_source_x_0_0_0_0, '0', analog_frequency_modulator_fc_0, '0']
 - [analog_sig_source_x_1, '0', blocks_float_to_complex_0, '1']
-- [blocks_add_xx_0, '0', qtgui_time_sink_x_0_0_0_0, '0']
-- [blocks_delay_0, '0', blocks_add_xx_0, '1']
 - [blocks_float_to_complex_0, '0', blocks_multiply_xx_0, '0']
 - [blocks_multiply_xx_0, '0', qtgui_time_sink_x_0_0_0, '0']
 - [blocks_multiply_xx_0, '0', uhd_usrp_sink_0, '0']
 - [blocks_multiply_xx_0, '0', uhd_usrp_sink_0, '1']
-- [epy_block_0, '0', blocks_add_xx_0, '0']
-- [epy_block_0_0, '0', blocks_delay_0, '0']
+- [blocks_vector_source_x_0, '0', qtgui_time_sink_x_0_0_0_0, '0']
 - [uhd_usrp_source_0, '0', qtgui_freq_sink_x_0, '0']
 - [uhd_usrp_source_0, '0', qtgui_time_sink_x_0_0, '0']
 - [uhd_usrp_source_0, '1', qtgui_freq_sink_x_0_0, '0']
