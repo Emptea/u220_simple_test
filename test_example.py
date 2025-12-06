@@ -82,7 +82,7 @@ class test_example(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
         self.uhd_usrp_source_0 = uhd.usrp_source(
-            ",".join(("type=b200", "send_frame_size=16384,num_send_frames=512")),
+            ",".join(("type=b200", "recv_frame_size=16384,num_recv_frames=512, send_frame_size=16384,num_send_frames=512")),
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',
@@ -100,7 +100,7 @@ class test_example(gr.top_block, Qt.QWidget):
         self.uhd_usrp_source_0.set_samp_rate(samp_rate)
         # No synchronization enforced.
         self.uhd_usrp_sink_0 = uhd.usrp_sink(
-            ",".join(("type=b200", "send_frame_size=16384,num_send_frames=512")),
+            ",".join(("type=b200", '')),
             uhd.stream_args(
                 cpu_format="fc32",
                 args='',

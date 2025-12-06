@@ -149,7 +149,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [320, 164.0]
+    coordinate: [316, 176]
     rotation: 0
     state: disabled
 - name: gain
@@ -981,7 +981,7 @@ blocks:
     clock_source7: ''
     comment: ''
     dev_addr: '"type=b200"'
-    dev_args: '"send_frame_size=16384,num_send_frames=512"'
+    dev_args: '"recv_frame_size=16384,num_recv_frames=512, send_frame_size=16384,num_send_frames=512"'
     gain0: gain
     gain1: gain
     gain10: '0'
@@ -1289,7 +1289,7 @@ blocks:
     dc_offs_enb8: default
     dc_offs_enb9: default
     dev_addr: '"type=b200"'
-    dev_args: '"send_frame_size=16384,num_send_frames=512"'
+    dev_args: '"recv_frame_size=16384,num_recv_frames=512, send_frame_size=16384,num_send_frames=512"'
     gain0: '40'
     gain1: '40'
     gain10: '0'
